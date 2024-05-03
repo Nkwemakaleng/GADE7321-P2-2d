@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 public class Aim_Mechanics : MonoBehaviour
 {
     public GameObject Bullet1;
     public float Power = 10;
-    public Slider rotationSlider;
+    public Slider PowerSlider;
     public Transform bulletPoint;
 
     public GameObject Point;
     GameObject[] points;
     public int numOfPoints = 10;
     public float spacing = 0.5f;
-
+    public TextMeshProUGUI powerValueText;
     Vector3 direction;
 
     private void Start()
@@ -24,6 +25,8 @@ public class Aim_Mechanics : MonoBehaviour
         {
             points[i] = Instantiate(Point, bulletPoint.position, Quaternion.identity);
         }
+        PowerSlider.value = Power;
+        UpdatePowerValueText();
     }
 
     void Update()
@@ -36,7 +39,7 @@ public class Aim_Mechanics : MonoBehaviour
         transform.right = direction;
 
         // Shoot
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(1))
         {
             Shoot();
         }
@@ -66,4 +69,24 @@ public class Aim_Mechanics : MonoBehaviour
         Vector3 position = bulletPoint.position + direction.normalized * Power * t + 0.5f * gravity * (t * t);
         return position;
     }
+
+
+
+    // Method to change power with the slider
+    public void ChangePower()
+    {
+        Power = PowerSlider.value;
+        UpdatePowerValueText();
+    }
+
+    // Method to update the power value in the text box
+    void UpdatePowerValueText()
+    {
+        powerValueText.text = "Power: " + Power.ToString("0");
+    }
+
+
+
+
+
 }
