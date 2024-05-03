@@ -376,6 +376,9 @@
 "Assets/Albert/Code/Aim_Mechanics.cs"
 "Assets/Albert/Code/Bullet_Normal.cs"
 "Assets/Albert/Code/Player1.cs"
+"Assets/Nkwe/Scripts/CameraControl.cs"
+"Assets/Nkwe/Scripts/MenuManager.cs"
+"Assets/Nkwe/Scripts/TurnBasedManager.cs"
 -langversion:9.0
 
 /deterministic
