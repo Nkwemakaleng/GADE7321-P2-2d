@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Foor
+  - Bullet
   layers:
   - Default
   - TransparentFX
@@ -40,4 +42,25 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Base
+    uniqueID: 1231505497
+    locked: 0
+  - name: Background
+    uniqueID: 2127470023
+    locked: 0
+  - name: Terrain
+    uniqueID: 1098382373
+    locked: 0
+  - name: AimPart
+    uniqueID: 1949400899
+    locked: 0
+  - name: bullets
+    uniqueID: 842756835
+    locked: 0
+  - name: Players
+    uniqueID: 3374596783
+    locked: 0
+  - name: Cannons
+    uniqueID: 4010595091
     locked: 0
