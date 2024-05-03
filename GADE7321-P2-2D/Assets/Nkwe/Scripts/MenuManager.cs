@@ -17,7 +17,7 @@ public class MenuManager : MonoBehaviour
     void Start()
     {
         // Disable all canvases initially
-        canvas1.enabled = false;
+        canvas1.enabled = true;
         canvas2.enabled = false;
         canvas3.enabled = false;
 
@@ -47,14 +47,18 @@ public class MenuManager : MonoBehaviour
         canvas3.enabled = true;
     }
 
+    public void LoadScene0()
+    {
+        SceneManager.LoadScene(0);
+    }
     public void LoadScene1()
     {
-        SceneManager.LoadScene(scene1Name);
+        SceneManager.LoadScene(1);
     }
 
     public void LoadScene2()
     {
-        SceneManager.LoadScene(scene2Name);
+        SceneManager.LoadScene(2);
     }
 
     public void SetVolume(float volume)
@@ -69,6 +73,11 @@ public class MenuManager : MonoBehaviour
         canvas1.enabled = false;
         canvas2.enabled = false;
         canvas3.enabled = false;
+    }
+
+    public void QuitApplication()
+    {
+        Application.Quit();
     }
 }
 

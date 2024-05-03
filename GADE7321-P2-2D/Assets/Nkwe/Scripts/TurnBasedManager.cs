@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TurnBasedManager : MonoBehaviour
@@ -28,8 +29,8 @@ public class TurnBasedManager : MonoBehaviour
     void StartTurn()
     {
         // Activate player controls
-        players[currentPlayerIndex].GetComponent<PlayerController>().EnableControls();
-
+        players[currentPlayerIndex].GetComponent<Player1>().enabled = true;
+        players[currentPlayerIndex].GetComponent<Aim_Mechanics>().enabled =true;
         Debug.Log("Player " + (currentPlayerIndex + 1) + "'s turn");
     }
 
@@ -37,7 +38,9 @@ public class TurnBasedManager : MonoBehaviour
     void EndTurn()
     {
         // Deactivate player controls
-        players[currentPlayerIndex].GetComponent<PlayerController>().DisableControls();
+        players[currentPlayerIndex].GetComponent<Player1>().enabled = false; 
+        players[currentPlayerIndex].GetComponent<Aim_Mechanics>().enabled = false;
+        
 
         // Move to the next player
         currentPlayerIndex = (currentPlayerIndex + 1) % players.Length;

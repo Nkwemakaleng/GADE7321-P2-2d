@@ -1022,7 +1022,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 500913563}
-  - component: {fileID: 500913564}
+  - component: {fileID: 500913565}
   m_Layer: 0
   m_Name: 'NkweManagers '
   m_TagString: Untagged
@@ -1045,7 +1045,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &500913564
+--- !u!114 &500913565
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1057,6 +1057,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3970ccd21b88f24c9b8c0d91fb78d44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  players:
+  - {fileID: 1359043188}
+  - {fileID: 1988362324}
 --- !u!1 &546702538
 GameObject:
   m_ObjectHideFlags: 0
@@ -2788,7 +2791,31 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1310761764}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 500913561}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1407992142}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1310761764
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3114,6 +3141,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55b7b6ccd772b1e48bba3344b3cbc553, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  players:
+  - {fileID: 1359043188}
+  - {fileID: 1988362324}
+  zoomSlider: {fileID: 1483434182}
+  zoomSpeed: 1
+  minZoom: 5
+  maxZoom: 30
+  followSpeed: 5
 --- !u!1 &1440374193
 GameObject:
   m_ObjectHideFlags: 0
@@ -4506,6 +4541,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4597227054281471198, guid: c4539e21680543341bdb08656d983b5f, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5848632570174453185, guid: c4539e21680543341bdb08656d983b5f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -243.18944
