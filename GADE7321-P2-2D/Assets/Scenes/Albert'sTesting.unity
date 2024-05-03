@@ -393,8 +393,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 286.00272, y: 116.47797}
-  m_SizeDelta: {x: 89.2333, y: 35.5351}
+  m_AnchoredPosition: {x: 274.85324, y: 119.40619}
+  m_SizeDelta: {x: 66.9357, y: 33.9588}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &100843347
 MonoBehaviour:
@@ -527,8 +527,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 286, y: 164.72105}
-  m_SizeDelta: {x: 89.2333, y: 35.5351}
+  m_AnchoredPosition: {x: 274.8512, y: 165.50923}
+  m_SizeDelta: {x: 66.9357, y: 33.9588}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &114217305
 MonoBehaviour:
@@ -3897,7 +3897,7 @@ GameObject:
   - component: {fileID: 1988362326}
   - component: {fileID: 1988362325}
   m_Layer: 0
-  m_Name: Player1 (1)
+  m_Name: Player2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3989,7 +3989,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   currentHealth: 0
-  healthText: {fileID: 1029249167}
+  healthText: {fileID: 2052986298}
   respawnCooldown: 5
   respawnPoint: {fileID: 1127664911}
   respawnHeight: 10
