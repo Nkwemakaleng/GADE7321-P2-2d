@@ -25,6 +25,11 @@ public class Player1 : MonoBehaviour
     public bool playersturn = true;
     private int remainingMovement; // Remaining movement distance
     Rigidbody2D rb;
+    
+    // Jetpack
+    public bool jetpackEnabled = true;
+    public float jetpackForce = 5f;
+    public KeyCode jetpackKey = KeyCode.E; // Key to trigger jetpack1
 
     void Start()
     {
@@ -56,6 +61,12 @@ public class Player1 : MonoBehaviour
 
                 // Decrease remaining movement based on horizontal movement
                 remainingMovement -= Mathf.Abs((int)(horizontalInput * moveSpeed * Time.deltaTime));
+                
+                // Jetpack movement
+                if (jetpackEnabled && Input.GetKey(jetpackKey))
+                {
+                    rb.AddForce(Vector2.up * jetpackForce, ForceMode2D.Force);
+                }
             }
             else
             {
