@@ -13,24 +13,33 @@ public class CameraController : MonoBehaviour
     private Camera cam; // Reference to the camera component
     private int currentPlayerIndex = 0; // Index of the current player
     private GameObject currentTargetPlayer; // Current target player to follow
+    private TurnBasedManager turnManager;
 
 
     private void Start()
     {
-       cam = GetComponent<Camera>();
+        //turnBasedManager.currentPlayerIndex
+        cam = GetComponent<Camera>();
         if (cam == null)
         {
             Debug.LogError("Camera component is missing.");
             return;
         }
-
         if (players == null || players.Length == 0)
         {
             Debug.LogError("Players array is not set or empty.");
             return;
         }
         TurnBasedManager.OnTurnChanged += UpdateTargetPlayer;
-        UpdateTargetPlayer(players[0]);
+        // Get initial player list from TurnBasedManager
+        TurnBasedManager turnManager = FindObjectOfType<TurnBasedManager>();
+        if (turnManager != null)
+        {
+            players = turnManager.players;
+            currentPlayerIndex = turnManager.GetCurrentPlayerIndex();
+        }
+
+        UpdateTargetPlayer(players[currentPlayerIndex]);
     }
 
     private void Update()
@@ -38,8 +47,8 @@ public class CameraController : MonoBehaviour
         HandleZoom();
         FollowPlayer();
 
-        // Switch player on specific conditions (e.g., player's turn)
-        if (Input.GetKeyDown(KeyCode.Space))
+        // Switch player on specific conditions
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             SwitchToNextPlayer();
         }
@@ -85,7 +94,6 @@ public class CameraController : MonoBehaviour
             Debug.LogWarning("No valid player to set camera position.");
             return;
         }
-
         transform.position = new Vector3(players[currentPlayerIndex].transform.position.x, players[currentPlayerIndex].transform.position.y, transform.position.z);
     }
 
@@ -104,4 +112,12 @@ public class CameraController : MonoBehaviour
     {
         TurnBasedManager.OnTurnChanged -= UpdateTargetPlayer; // Unsubscribe from the turn change event
     }
+    private void OnTurnChanged(int playerIndex, GameObject newPlayer)
+    {
+        currentPlayerIndex = playerIndex;
+        SetCameraPosition();
+    }
+    
+    
+
 }
