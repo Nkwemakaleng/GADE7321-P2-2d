@@ -50,8 +50,8 @@ public class Aim_Mechanics : MonoBehaviour
         }
     }
 
-    // Bullet selector
-    // You didn't provide this part, but you can implement it as per your requirements.
+    
+    
 
     public void Shoot()
     {

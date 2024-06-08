@@ -375,6 +375,7 @@
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2022.3.21f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll"
 "Assets/Albert/Code/Aim_Mechanics.cs"
 "Assets/Albert/Code/Bullet_Normal.cs"
+"Assets/Albert/Code/ButtonManagerMenu.cs"
 "Assets/Albert/Code/Player1.cs"
 "Assets/Nkwe/Scripts/CameraControl.cs"
 "Assets/Nkwe/Scripts/MenuManager.cs"
