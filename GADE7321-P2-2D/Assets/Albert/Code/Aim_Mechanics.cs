@@ -77,15 +77,19 @@ public class Aim_Mechanics : MonoBehaviour
     {
         Power = PowerSlider.value;
         UpdatePowerValueText();
+      //  UpdateShieldValueText();
     }
 
     // Method to update the power value in the text box
     void UpdatePowerValueText()
     {
-        powerValueText.text = "Power: " + Power.ToString("0");
+        powerValueText.text =  Power.ToString("0");
     }
 
-
+   // void UpdateShieldValueText()
+   // {
+    //    ShieldValueText.text = Power.ToString("0") ;
+   // }
 
 
 

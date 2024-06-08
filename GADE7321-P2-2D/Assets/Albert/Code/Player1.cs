@@ -146,7 +146,7 @@ public class Player1 : MonoBehaviour
     // Method to update health UI
     void UpdateHealthUI()
     {
-        healthText.text = "Health: " + currentHealth.ToString();
+        healthText.text = currentHealth.ToString();
 
     }
 }
