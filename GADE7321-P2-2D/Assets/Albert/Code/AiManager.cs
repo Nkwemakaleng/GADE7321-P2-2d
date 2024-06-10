@@ -2,12 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using TMPro;
 
 public class AiManager : MonoBehaviour
 {
-
     public int maxHealth = 100;
     public int currentHealth;
     public TMP_Text healthText;
@@ -17,18 +15,28 @@ public class AiManager : MonoBehaviour
     private bool isRespawning = false;
     public float moveSpeed = 5f;
     public int maxMovement = 10;
-    public bool aiTurn = true;
+    public bool aiTurn = false;
     private int remainingMovement;
     Rigidbody2D rb;
-    private AIAimMechanics aiAimMechanics;
+    public AIAimMechanics aiAimMechanics;
+    private GameObject player;
 
     void Start()
     {
-        aiAimMechanics = GetComponent<AIAimMechanics>();
+        if (aiAimMechanics == null)
+        {
+            Debug.LogWarning("AIAimMechanics component not found.");
+        }
+        else
+        {
+            Debug.Log("AIAimMechanics component found.");
+        }
+        TurnBasedManager.OnTurnChanged += OnTurnChanged;
         remainingMovement = maxMovement;
         rb = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
         UpdateHealthUI();
+        player = GameObject.Find("Player1"); // Find the player GameObject
     }
 
     void Update()
@@ -40,15 +48,33 @@ public class AiManager : MonoBehaviour
         UpdateHealthUI();
     }
 
+    private void OnTurnChanged(int playerIndex, GameObject newPlayer)
+    {
+        if (newPlayer == gameObject)
+        {
+            Debug.Log("AI's Turn");
+            aiTurn = true;
+        }
+        else
+        {
+            aiTurn = false;
+        }
+    }
+
     void AIDecisionMaking()
     {
-        
+        if (aiAimMechanics == null)
+        {
+            Debug.LogError("AIAimMechanics component is missing.");
+            return;
+        }
+
         GameState currentState = new GameState
         {
             aiPosition = transform.position,
-            playerPosition = GameObject.Find("Player1").transform.position,
+            playerPosition = player.transform.position,
             aiHealth = currentHealth,
-            playerHealth = GameObject.Find("Player1").GetComponent<Player1>().currentHealth,
+            playerHealth = player.GetComponent<Player1>().currentHealth,
             aiTurn = aiTurn
         };
 
@@ -58,7 +84,6 @@ public class AiManager : MonoBehaviour
         remainingMovement -= Mathf.Abs((int)(movement.magnitude));
         if (remainingMovement <= 0)
         {
-
             aiAimMechanics.AIUpdate(); // AI aims and shoots
             aiTurn = false;
         }
@@ -217,3 +242,15 @@ public class AiManager : MonoBehaviour
         return newState;
     }
 }
+
+// Remove this section from AiManager.cs
+/*
+public struct GameState
+{
+    public Vector2 aiPosition;
+    public Vector2 playerPosition;
+    public int aiHealth;
+    public int playerHealth;
+    public bool aiTurn;
+}
+*/

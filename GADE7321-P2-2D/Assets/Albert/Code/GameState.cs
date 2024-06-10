@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameState : MonoBehaviour
+public class GameState 
 {
     public Vector2 aiPosition;
     public Vector2 playerPosition;
@@ -14,7 +14,7 @@ public class GameState : MonoBehaviour
         
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
         

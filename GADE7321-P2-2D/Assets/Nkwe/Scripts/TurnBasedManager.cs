@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class TurnBasedManager : MonoBehaviour
 {
-    public GameObject[] players; // Array of player GameObjects
+    public GameObject[] players; // Assign AiManager GameObjects in the Inspector
     [SerializeField] private float turnDuration = 10f; // Duration of each turn in seconds
     public int currentPlayerIndex = 0; // Index of the current player
     private float remainingTurnTime; // Remaining time for the current turn
@@ -17,10 +17,10 @@ public class TurnBasedManager : MonoBehaviour
     [SerializeField] private TMP_Text turnDurationText;
 
     private BulletManager bulletManager;
+
     // Start is called before the first frame update
     void Start()
     {
-        TurnBasedManager.OnTurnChanged += OnTurnChanged;
         remainingTurnTime = turnDuration;
 
         // Ensure all player controls are disabled first
