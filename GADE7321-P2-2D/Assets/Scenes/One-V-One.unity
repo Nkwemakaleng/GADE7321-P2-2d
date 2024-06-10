@@ -1123,11 +1123,11 @@ MonoBehaviour:
   respawnPoint: {fileID: 414246228}
   respawnHeight: 10
   respawnKey: 114
-  respawnAmounts: 0
-  respawnAmountsLeft: 0
+  respawnAmounts: 4
+  respawnAmountsLeft: 4
   respawnAmountText: {fileID: 0}
   moveSpeed: 5
-  maxMovement: 100
+  maxMovement: 10
   playersturn: 1
   jetpackEnabled: 1
   jetpackForce: 5
@@ -3102,12 +3102,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Bullet1: {fileID: 8907749090414912773, guid: c4539e21680543341bdb08656d983b5f, type: 3}
-  Power: 10
+  Power: 20
   PowerSlider: {fileID: 1320155586}
   bulletPoint: {fileID: 215917346}
   Point: {fileID: 4773706243498948052, guid: 7bd591ff3b111e8439c17158e814c1bc, type: 3}
   numOfPoints: 10
-  spacing: 0.5
+  spacing: 0.25
   powerValueText: {fileID: 1813729031}
 --- !u!4 &1024342661
 Transform:
@@ -4450,12 +4450,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Bullet1: {fileID: 8907749090414912773, guid: c4539e21680543341bdb08656d983b5f, type: 3}
-  Power: 10
+  Power: 20
   PowerSlider: {fileID: 1320155586}
   bulletPoint: {fileID: 468470930}
   Point: {fileID: 4773706243498948052, guid: 7bd591ff3b111e8439c17158e814c1bc, type: 3}
   numOfPoints: 10
-  spacing: 0.5
+  spacing: 0.25
   powerValueText: {fileID: 1322147015}
 --- !u!1 &1501643297
 GameObject:
