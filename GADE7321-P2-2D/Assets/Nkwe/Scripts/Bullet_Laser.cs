@@ -28,16 +28,11 @@ public class Bullet_Laser : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        /*if (collision.gameObject.CompareTag("Player"))
         {
             // Damage the player upon collision with the laser
             Destroy(collision.gameObject);
-        }
-        else if (collision.gameObject.CompareTag("Enemy"))
-        {
-            // Damage the enemy upon collision with the laser
-            Destroy(collision.gameObject);
-        }
+        }*/
 
         // Destroy the laser upon collision
         Destroy(gameObject);

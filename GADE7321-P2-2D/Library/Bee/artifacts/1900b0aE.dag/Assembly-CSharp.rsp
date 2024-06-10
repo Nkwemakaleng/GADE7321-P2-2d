@@ -376,7 +376,7 @@
 "Assets/Albert/Code/Aim_Mechanics.cs"
 "Assets/Albert/Code/Bullet_Normal.cs"
 "Assets/Albert/Code/Player1.cs"
-"Assets/Nkwe/Scripts/BulletsSwap.cs"
+"Assets/Nkwe/Scripts/BulletManager.cs"
 "Assets/Nkwe/Scripts/Bullet_Laser.cs"
 "Assets/Nkwe/Scripts/Bullet_Shotgun.cs"
 "Assets/Nkwe/Scripts/CameraControl.cs"

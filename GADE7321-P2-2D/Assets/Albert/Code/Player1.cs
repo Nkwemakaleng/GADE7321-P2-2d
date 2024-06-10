@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,7 +8,6 @@ using TMPro;
 public class Player1 : MonoBehaviour
 {
     //player health
-
     public int maxHealth = 100; // Maximum health of the player
     public int currentHealth; // Current health of the player
     public TMP_Text healthText; // Reference to the TextMeshPro text for health display
@@ -33,8 +33,8 @@ public class Player1 : MonoBehaviour
     public bool jetpackEnabled = true;
     public float jetpackForce = 5f;
     public KeyCode jetpackKey = KeyCode.E; // Key to trigger jetpack1
-    private BulletManager bulletManager;
-    private TurnBasedManager turnManager;
+   [SerializeField] private BulletManager bulletManager;
+    [SerializeField] private TurnBasedManager turnManager;
 
     void Start()
     {
@@ -90,8 +90,17 @@ public class Player1 : MonoBehaviour
 
     }
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Bullet"))
+        {
+            BulletHit(bulletManager.bulletTypes[bulletManager.GetCurrentBulletIndex()].damage); // Apply the damage from the bullet
+            Destroy(other.gameObject); // Optionally destroy the bullet on hit); 
+            Debug.Log("Hit");
+        }
+    }
 
-    void OnTriggerEnter(Collider other)
+    /*void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Bullet"))
         {
@@ -99,21 +108,21 @@ public class Player1 : MonoBehaviour
             Destroy(other.gameObject); // Optionally destroy the bullet on hit); 
             Debug.Log("Hit");
         }
-    }
+    }*/
     // Method to handle player being hit by a bullet
+    
     public int BulletHit(int damage)
     {
         if (!isRespawning)
         {
             currentHealth -= damage; // Decrease player's health by the damage amount
             UpdateHealthUI(); // Update health UI
-            if (currentHealth <= 0)
+            if (currentHealth < 0 || currentHealth == 0)
             {
                 Die(); // Die if health reaches zero
             }
         }
         return currentHealth;
-        
     }
 
     // Method to handle player death
@@ -133,20 +142,17 @@ public class Player1 : MonoBehaviour
         isRespawning = true;
         yield return new WaitForSeconds(respawnCooldown);
 
-        if (currentHealth <= 0)
+        if (currentHealth < 0 || currentHealth == 0)
         {
             Reset();
         }
-
         isRespawning = false;
     }
 
     // Method to reset player's position and rotation
     void Reset()
     {
-        if (!isRespawning)
-        {
-            if (currentHealth <= 0)
+        if (currentHealth == 0)
             {
                 if (respawnAmountsLeft > 0 )
                 {
@@ -178,13 +184,11 @@ public class Player1 : MonoBehaviour
                     Debug.Log("No enough respawns left for automatic respawn");
                     DestroyThisObject();
                 }
-                
-                
             }
             currentHealth = maxHealth; // Reset player's health
             UpdateHealthUI(); // Update health UI
             UpdateRespawnText();
-        }
+        
     }
 
     // Method to update health UI

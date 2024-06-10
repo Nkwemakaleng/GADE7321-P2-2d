@@ -11,6 +11,7 @@ public class Bullet_Normal : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        Destroy(this.gameObject, 5f);
     }
 
     // Update is called once per frame
@@ -20,7 +21,7 @@ public class Bullet_Normal : MonoBehaviour
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    /*private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
         {
@@ -32,7 +33,7 @@ public class Bullet_Normal : MonoBehaviour
             // Destroy the bullet 
             Destroy(this.gameObject, 5f) ;
         }
-    }
+    }*/
 
 
 

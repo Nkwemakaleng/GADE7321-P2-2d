@@ -13,7 +13,7 @@ public class TurnBasedManager : MonoBehaviour
     [SerializeField] private TMP_Text turnText;
     [SerializeField] private TMP_Text turnDurationText;
 
-    private Player1 player1;
+    private BulletManager bulletManager;
     // Start is called before the first frame update
     void Start()
     {

@@ -6,7 +6,6 @@ using UnityEngine.EventSystems;
 using TMPro;
 public class Aim_Mechanics : MonoBehaviour
 {
-    public GameObject Bullet1;
     public float Power = 10;
     public Slider PowerSlider;
     public Transform bulletPoint;
@@ -18,7 +17,7 @@ public class Aim_Mechanics : MonoBehaviour
     public TextMeshProUGUI powerValueText;
     Vector3 direction;
 
-    private BulletManager bulletManager;
+    [SerializeField] private BulletManager bulletManager;
     private void Start()
     {
         points = new GameObject[numOfPoints];
@@ -26,7 +25,7 @@ public class Aim_Mechanics : MonoBehaviour
         {
             points[i] = Instantiate(Point, bulletPoint.position, Quaternion.identity);
         }
-        bulletManager = FindObjectOfType<BulletManager>();
+        //bulletManager = FindObjectOfType<BulletManager>();
         PowerSlider.value = Power;
         UpdatePowerValueText();
         bulletManager.updateBulletText();
@@ -48,6 +47,10 @@ public class Aim_Mechanics : MonoBehaviour
         {
             Shoot();
         }
+        if (Input.GetKey(KeyCode.R))
+        {
+            bulletManager.ReloadCurrentBulletType();
+        }
 
         for (int i = 0; i < numOfPoints; i++)
         {
@@ -58,12 +61,11 @@ public class Aim_Mechanics : MonoBehaviour
 
     public void Shoot()
     {
-        
         GameObject currentBullet = bulletManager.GetCurrentBullet();
         bulletManager.updateBulletText();
         if (currentBullet != null)
         {
-            if (bulletManager.GetCurrentAmount() >= bulletManager.bulletTypes[bulletManager.GetCurrentBulletIndex()].maxBullets)
+            if (bulletManager.GetCurrentAmount() > 0 )//bulletManager.bulletTypes[bulletManager.GetCurrentBulletIndex()].maxBullets)
             {
                 GameObject newBullet = Instantiate(currentBullet, bulletPoint.position, Quaternion.identity);
                 Rigidbody2D bulletRB = newBullet.GetComponent<Rigidbody2D>();
@@ -96,6 +98,7 @@ public class Aim_Mechanics : MonoBehaviour
 // Method to change power with the slider
     public void ChangePower()
     {
+        Power = 10f;
         Power = PowerSlider.value;
         UpdatePowerValueText();
         Debug.Log("Power changed to: " + Power + " for player: " + gameObject.name);
@@ -111,13 +114,15 @@ public class Aim_Mechanics : MonoBehaviour
         TurnBasedManager.OnTurnChanged -= OnTurnChanged;
     }
 
-    private void OnTurnChanged(int players, GameObject newPlayer)
+    private void OnTurnChanged(int playerIndex, GameObject newPlayer)
     {
         if (newPlayer == gameObject)
         {
+            Power = 10f; // Reset the power
             PowerSlider.value = Power; // Sync slider with power value
             UpdatePowerValueText();
-            //PowerSlider.interactable = true; // Enable slider for the active player
+            bulletManager.ReloadAllBulletTypes(); // Reload all bullet types for the current player
+            bulletManager.updateBulletText(); // Update bullet text immediately
             Debug.Log("Turn changed to: " + gameObject.name + " with power: " + Power);
         }
         else
