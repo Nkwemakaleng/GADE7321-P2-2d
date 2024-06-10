@@ -1123,9 +1123,17 @@ MonoBehaviour:
   respawnPoint: {fileID: 414246228}
   respawnHeight: 10
   respawnKey: 114
+  respawnAmounts: 0
+  respawnAmountsLeft: 0
+  respawnAmountText: {fileID: 0}
   moveSpeed: 5
   maxMovement: 100
   playersturn: 1
+  jetpackEnabled: 1
+  jetpackForce: 5
+  jetpackKey: 101
+  bulletManager: {fileID: 1953394641}
+  turnManager: {fileID: 1302774544}
 --- !u!212 &302354085
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -6066,6 +6074,11 @@ MonoBehaviour:
   maxMovement: 10
   aiTurn: 0
   aiAimMechanics: {fileID: 1455570360}
+  respawnAmounts: 4
+  respawnAmountsLeft: 3
+  respawnAmountText: {fileID: 0}
+  bulletManager: {fileID: 1953394641}
+  turnManager: {fileID: 1302774544}
 --- !u!1 &2072543393
 GameObject:
   m_ObjectHideFlags: 0

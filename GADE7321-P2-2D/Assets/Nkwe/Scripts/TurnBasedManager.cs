@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
+
+
 
 public class TurnBasedManager : MonoBehaviour
 {
@@ -16,10 +19,7 @@ public class TurnBasedManager : MonoBehaviour
     [SerializeField] private TMP_Text turnText;
     [SerializeField] private TMP_Text turnDurationText;
 
-    private BulletManager bulletManager;
-
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         remainingTurnTime = turnDuration;
 
@@ -32,21 +32,15 @@ public class TurnBasedManager : MonoBehaviour
         // Enable controls for the current player
         if (players[currentPlayerIndex] != null)
         {
-            SetPlayerControl(players[currentPlayerIndex], true);
-            Debug.Log("Player " + (currentPlayerIndex + 1) + "'s turn");
-            turnText.text = "Player: " + players[currentPlayerIndex].name;
-
-            OnTurnChanged?.Invoke(currentPlayerIndex, players[currentPlayerIndex]);
+            StartTurn(); // Starts the first player's turn
         }
         else
         {
             Debug.LogError("Player at index " + currentPlayerIndex + " is null.");
         }
-        NotifyTurnChanged();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         // Update the remaining turn time
         remainingTurnTime -= Time.deltaTime;
@@ -88,12 +82,12 @@ public class TurnBasedManager : MonoBehaviour
         if (players[currentPlayerIndex] != null)
         {
             SetPlayerControl(players[currentPlayerIndex], false);
-
         }
+
+        // Move to the next player's turn
         currentPlayerIndex = (currentPlayerIndex + 1) % players.Length;
         StartTurn();
         NotifyTurnChanged();
-
     }
 
     // Method to enable or disable player controls
@@ -105,25 +99,26 @@ public class TurnBasedManager : MonoBehaviour
             return;
         }
 
-        var player1Component = player.GetComponent<Player1>();
+        // Try to find both Aim_Mechanics and AIAimMechanics components
         var aimMechanicsComponent = player.GetComponentInChildren<Aim_Mechanics>();
+        var aiAimMechanicsComponent = player.GetComponentInChildren<AIAimMechanics>();
 
-        if (player1Component != null)
-        {
-            player1Component.enabled = isEnabled;
-        }
-        else
-        {
-            Debug.LogError("Player1 component is missing on player " + player.name);
-        }
-
+        // Enable/disable Aim_Mechanics if found
         if (aimMechanicsComponent != null)
         {
             aimMechanicsComponent.enabled = isEnabled;
         }
-        else
+
+        // Enable/disable AIAimMechanics if found
+        if (aiAimMechanicsComponent != null)
         {
-            Debug.LogError("Aim_Mechanics component is missing on player " + player.name);
+            aiAimMechanicsComponent.enabled = isEnabled;
+        }
+
+        // Log errors if both components are missing
+        if (aimMechanicsComponent == null && aiAimMechanicsComponent == null)
+        {
+            Debug.LogError("Aim_Mechanics or AIAimMechanics component is missing on player " + player.name);
         }
     }
 
@@ -137,6 +132,7 @@ public class TurnBasedManager : MonoBehaviour
     {
         return remainingTurnTime;
     }
+
     public void OnEndTurnButtonClicked()
     {
         EndTurn();
@@ -144,10 +140,6 @@ public class TurnBasedManager : MonoBehaviour
 
     private void NotifyTurnChanged()
     {
-        if (OnTurnChanged != null)
-        {
-            OnTurnChanged(currentPlayerIndex, players[currentPlayerIndex]);
-        }
+        OnTurnChanged?.Invoke(currentPlayerIndex, players[currentPlayerIndex]);
     }
-
 }

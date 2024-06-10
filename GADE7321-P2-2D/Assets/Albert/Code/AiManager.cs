@@ -20,9 +20,15 @@ public class AiManager : MonoBehaviour
     Rigidbody2D rb;
     public AIAimMechanics aiAimMechanics;
     private GameObject player;
+    public int respawnAmounts;
+    public int respawnAmountsLeft;
+    public TMP_Text respawnAmountText;
+    [SerializeField] private BulletManager bulletManager;
+    [SerializeField] private TurnBasedManager turnManager;
 
     void Start()
     {
+        respawnAmountsLeft = respawnAmounts;
         if (aiAimMechanics == null)
         {
             Debug.LogWarning("AIAimMechanics component not found.");
@@ -69,23 +75,31 @@ public class AiManager : MonoBehaviour
             return;
         }
 
-        GameState currentState = new GameState
+        // Ensure the AI has the AIAimMechanics component attached
+        if (aiAimMechanics != null)
         {
-            aiPosition = transform.position,
-            playerPosition = player.transform.position,
-            aiHealth = currentHealth,
-            playerHealth = player.GetComponent<Player1>().currentHealth,
-            aiTurn = aiTurn
-        };
+            GameState currentState = new GameState
+            {
+                aiPosition = transform.position,
+                playerPosition = player.transform.position,
+                aiHealth = currentHealth,
+                playerHealth = player.GetComponent<Player1>().currentHealth,
+                aiTurn = aiTurn
+            };
 
-        Vector2 bestMove = GetBestMove(currentState, 3);
-        Vector3 movement = new Vector3(bestMove.x, bestMove.y, 0) * moveSpeed * Time.deltaTime;
-        transform.Translate(movement);
-        remainingMovement -= Mathf.Abs((int)(movement.magnitude));
-        if (remainingMovement <= 0)
+            Vector2 bestMove = GetBestMove(currentState, 3);
+            Vector2 direction = (bestMove - (Vector2)transform.position).normalized;
+            rb.MovePosition(rb.position + direction * moveSpeed * Time.fixedDeltaTime);
+            remainingMovement -= Mathf.Abs((int)(direction.magnitude));
+            if (remainingMovement <= 0)
+            {
+                aiAimMechanics.AIUpdate(); // AI aims and shoots
+                aiTurn = false;
+            }
+        }
+        else
         {
-            aiAimMechanics.AIUpdate(); // AI aims and shoots
-            aiTurn = false;
+            Debug.LogError("AIAimMechanics component is missing on AI.");
         }
     }
 
@@ -108,25 +122,28 @@ public class AiManager : MonoBehaviour
         return bestMove;
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Bullet"))
         {
-            BulletHit(20);
+            BulletHit(bulletManager.bulletTypes[bulletManager.GetCurrentBulletIndex()].damage); // Apply the damage from the bullet
+            Destroy(other.gameObject); // Optionally destroy the bullet on hit); 
+            Debug.Log("Hit");
         }
     }
 
-    void BulletHit(int damage)
+    public int BulletHit(int damage)
     {
         if (!isRespawning)
         {
-            currentHealth -= damage;
-            UpdateHealthUI();
-            if (currentHealth <= 0)
+            currentHealth -= damage; // Decrease player's health by the damage amount
+            UpdateHealthUI(); // Update health UI
+            if (currentHealth < 0 || currentHealth == 0)
             {
-                Die();
+                Die(); // Die if health reaches zero
             }
         }
+        return currentHealth;
     }
 
     void Die()
@@ -142,37 +159,64 @@ public class AiManager : MonoBehaviour
         isRespawning = true;
         yield return new WaitForSeconds(respawnCooldown);
 
-        if (currentHealth <= 0)
+        if (currentHealth < 0 || currentHealth == 0)
         {
             Reset();
         }
-
         isRespawning = false;
     }
 
     void Reset()
     {
-        if (!isRespawning)
+        if (currentHealth == 0)
         {
-            if (currentHealth <= 0)
+            if (respawnAmountsLeft > 0)
             {
                 transform.position = respawnPoint.transform.position;
                 transform.rotation = Quaternion.identity;
+                respawnAmountsLeft -= 1;
+                UpdateRespawnText();
             }
             else
+            {
+                Debug.Log("Not enough Lives Left");
+                DestroyThisObject();
+            }
+        }
+        else
+        {
+            if (respawnAmountsLeft > 0)
             {
                 Vector3 respawnPos = new Vector3(transform.position.x, respawnHeight, transform.position.z);
                 transform.position = respawnPos;
                 transform.rotation = Quaternion.identity;
+                respawnAmountsLeft -= 1;
+                UpdateRespawnText();
             }
-            currentHealth = maxHealth;
-            UpdateHealthUI();
+            else
+            {
+                Debug.Log("No enough respawns left for automatic respawn");
+                DestroyThisObject();
+            }
         }
+        currentHealth = maxHealth; // Reset player's health
+        UpdateHealthUI(); // Update health UI
+        UpdateRespawnText();
     }
 
     void UpdateHealthUI()
     {
-        healthText.text = currentHealth.ToString();
+        healthText.text = "Health: " + currentHealth.ToString();
+    }
+
+    void UpdateRespawnText()
+    {
+        respawnAmountText.text = "Respawn " + this.gameObject.name + " :" + Mathf.Max(respawnAmountsLeft, 0).ToString();
+    }
+
+    void DestroyThisObject()
+    {
+        Destroy(this.gameObject);
     }
 
     int Minimax(GameState state, int depth, bool maximizingPlayer, int alpha, int beta)
@@ -242,15 +286,3 @@ public class AiManager : MonoBehaviour
         return newState;
     }
 }
-
-// Remove this section from AiManager.cs
-/*
-public struct GameState
-{
-    public Vector2 aiPosition;
-    public Vector2 playerPosition;
-    public int aiHealth;
-    public int playerHealth;
-    public bool aiTurn;
-}
-*/
