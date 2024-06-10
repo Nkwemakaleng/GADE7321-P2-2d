@@ -15,6 +15,6 @@ EditorBuildSettings:
     path: Assets/Nkwe/Single Player.unity
     guid: 12614165f77dd6e4ebf3082b5c9fbff4
   - enabled: 1
-    path: Assets/Scenes/Albert'sTesting.unity
+    path: Assets/Nkwe/Albert'sTesting.unity
     guid: 163f750157146964fac1ae1c34fe98f3
   m_configObjects: {}
