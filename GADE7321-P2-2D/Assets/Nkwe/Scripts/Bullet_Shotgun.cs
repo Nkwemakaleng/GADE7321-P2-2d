@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Bullet_Shotgun : MonoBehaviour
 {
-    public int numPellets = 5; // Number of pellets in the shotgun spread
+    public int numPellets = 3; // Number of pellets in the shotgun spread
     public float spreadAngle = 30f; // Angle of spread for the shotgun pellets
     public float bulletSpeed = 10f; // Speed of each pellet
 

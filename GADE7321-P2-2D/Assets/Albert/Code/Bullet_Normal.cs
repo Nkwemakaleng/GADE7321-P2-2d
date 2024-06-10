@@ -5,6 +5,8 @@ using UnityEngine;
 public class Bullet_Normal : MonoBehaviour
 {
     Rigidbody2D rb;
+
+    public int damage = 20;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,8 +24,13 @@ public class Bullet_Normal : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            // Destroy the bullet after 10 seconds
-            Destroy(collision.gameObject, 10f);
+            Player1 player = collision.gameObject.GetComponent<Player1>();
+            if (player != null)
+            {
+                player.BulletHit(damage); // Apply damage to the player
+            }
+            // Destroy the bullet 
+            Destroy(this.gameObject, 5f) ;
         }
     }
 

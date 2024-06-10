@@ -4,58 +4,42 @@ using UnityEngine;
 
 public class Bullet_Laser : MonoBehaviour
 {
-    public float laserLength = 10f; // Length of the laser beam
-    public float laserWidth = 0.1f; // Width of the laser beam
-    public float laserDamage = 10f; // Damage inflicted by the laser beam per second
-    public LayerMask damageableLayers; // Layers that can be damaged by the laser
+    public float laserSpeed = 20f; // Speed of the laser
+    public float laserDuration = 2f;// Duration the laser stays active
+    public int damage = 20;
 
-    private LineRenderer lineRenderer;
-    private Vector2 laserDirection;
+    private Rigidbody2D rb;
 
     void Start()
     {
-        lineRenderer = GetComponent<LineRenderer>();
-        lineRenderer.startWidth = laserWidth;
-        lineRenderer.endWidth = laserWidth;
+        rb = GetComponent<Rigidbody2D>();
+        rb.velocity = transform.right * laserSpeed; // Move the laser in the direction it's facing
 
-        // Set laser direction based on the object's rotation
-        laserDirection = transform.right;
-
-        // Start the laser beam
-        StartCoroutine(FireLaser());
+        // Destroy the laser after a certain duration
+        Destroy(gameObject, laserDuration);
     }
 
-    IEnumerator FireLaser()
+    void Update()
     {
-        while (true)
+        // Update the laser's rotation based on its velocity
+        float angle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
         {
-            RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, laserDirection, laserLength, damageableLayers);
-
-            // Set the position of the line renderer
-            lineRenderer.positionCount = 2;
-            lineRenderer.SetPosition(0, transform.position);
-
-            if (hits.Length > 0)
-            {
-                // If the laser hits something, set the end position to the hit point
-                lineRenderer.SetPosition(1, hits[0].point);
-
-                // Damage the hit object
-                DamageableObject damageableObject = hits[0].collider.GetComponent<DamageableObject>();
-                if (damageableObject != null)
-                {
-                    damageableObject.TakeDamage(laserDamage * Time.deltaTime);
-                }
-            }
-            else
-            {
-                // If the laser doesn't hit anything, extend it to its maximum length
-                Vector2 endPosition = transform.position + laserDirection * laserLength;
-                lineRenderer.SetPosition(1, endPosition);
-            }
-
-            // Wait for the next frame
-            yield return null;
+            // Damage the player upon collision with the laser
+            Destroy(collision.gameObject);
         }
+        else if (collision.gameObject.CompareTag("Enemy"))
+        {
+            // Damage the enemy upon collision with the laser
+            Destroy(collision.gameObject);
+        }
+
+        // Destroy the laser upon collision
+        Destroy(gameObject);
     }
 }

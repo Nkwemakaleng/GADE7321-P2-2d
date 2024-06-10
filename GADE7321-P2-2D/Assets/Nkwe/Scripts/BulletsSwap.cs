@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class BulletManager : MonoBehaviour
@@ -7,8 +8,10 @@ public class BulletManager : MonoBehaviour
     {
         public GameObject bulletPrefab; // The bullet prefab
         public int maxBullets; // Maximum number of bullets the player can have for this type
-        [HideInInspector]
         public int currentBullets; // Current number of bullets the player has for this type
+        public TMP_Text bulletName; // TextMeshPro field to display the bullet name
+        public TMP_Text bulletCount; // TextMeshPro field to display the bullet count
+        public int damage;
     }
 
     public BulletType[] bulletTypes; // Array to hold different bullet types
@@ -22,6 +25,9 @@ public class BulletManager : MonoBehaviour
         {
             type.currentBullets = type.maxBullets;
         }
+
+        /*// Initialize text for each bullet type
+        updateBulletText();*/
     }
 
     void Update()
@@ -49,6 +55,7 @@ public class BulletManager : MonoBehaviour
             {
                 currentBulletIndex = bulletIndex;
                 Debug.Log("Switched to bullet: " + bulletTypes[bulletIndex].bulletPrefab.name);
+                updateBulletText();
             }
             else
             {
@@ -59,6 +66,7 @@ public class BulletManager : MonoBehaviour
         {
             Debug.LogWarning("Invalid bullet index!");
         }
+        
     }
 
     public GameObject GetCurrentBullet()
@@ -68,14 +76,41 @@ public class BulletManager : MonoBehaviour
 
     public void ReduceBulletCount()
     {
-        bulletTypes[currentBulletIndex].currentBullets--;
+        bulletTypes[currentBulletIndex].currentBullets -=1;
+        updateBulletText();
     }
 
     public void ReloadCurrentBulletType()
     {
         bulletTypes[currentBulletIndex].currentBullets = bulletTypes[currentBulletIndex].maxBullets;
+        updateBulletText();
     }
-}
 
+    public void updateBulletText()
+    {
+        for (int i = 0; i < bulletTypes.Length; i++)
+        {
+            BulletType type = bulletTypes[i];
+            if (type.bulletName != null)
+            {
+                type.bulletName.text = type.bulletPrefab.name;
+            }
+            if (type.bulletCount != null)
+            {
+                type.bulletCount.text = type.currentBullets.ToString() + "/" + type.maxBullets.ToString();
+            }
+        }
+    }
+
+    public int GetCurrentAmount()
+    {
+        return bulletTypes[currentBulletIndex].currentBullets;
+    }
+
+    public int GetCurrentBulletIndex()
+    {
+        return currentBulletIndex;
+    }
+    
 }
 

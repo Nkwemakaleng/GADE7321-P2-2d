@@ -18,6 +18,7 @@ public class Aim_Mechanics : MonoBehaviour
     public TextMeshProUGUI powerValueText;
     Vector3 direction;
 
+    private BulletManager bulletManager;
     private void Start()
     {
         points = new GameObject[numOfPoints];
@@ -25,12 +26,16 @@ public class Aim_Mechanics : MonoBehaviour
         {
             points[i] = Instantiate(Point, bulletPoint.position, Quaternion.identity);
         }
+        bulletManager = FindObjectOfType<BulletManager>();
         PowerSlider.value = Power;
         UpdatePowerValueText();
+        bulletManager.updateBulletText();
+        TurnBasedManager.OnTurnChanged += OnTurnChanged;
     }
 
     void Update()
     {
+
         // Cannon rotation
         Vector3 cannonPosition = transform.position;
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10)); // Set z to 10 (or any distance from the camera)
@@ -50,17 +55,36 @@ public class Aim_Mechanics : MonoBehaviour
         }
     }
 
-    // Bullet selector
-    // You didn't provide this part, but you can implement it as per your requirements.
 
     public void Shoot()
     {
-        GameObject newBullet = Instantiate(Bullet1, bulletPoint.position, Quaternion.identity);
-        Rigidbody2D bulletRB = newBullet.GetComponent<Rigidbody2D>();
-        if (bulletRB != null)
+        
+        GameObject currentBullet = bulletManager.GetCurrentBullet();
+        bulletManager.updateBulletText();
+        if (currentBullet != null)
         {
-            bulletRB.velocity = direction.normalized * Power;
+            if (bulletManager.GetCurrentAmount() >= bulletManager.bulletTypes[bulletManager.GetCurrentBulletIndex()].maxBullets)
+            {
+                GameObject newBullet = Instantiate(currentBullet, bulletPoint.position, Quaternion.identity);
+                Rigidbody2D bulletRB = newBullet.GetComponent<Rigidbody2D>();
+                if (bulletRB != null)
+                {
+                    bulletRB.velocity = direction.normalized * Power;
+                }
+                bulletManager.ReduceBulletCount();
+                bulletManager.updateBulletText();
+            }
+            else
+            {
+                Debug.Log("Out of " + bulletManager.bulletTypes[bulletManager.GetCurrentBulletIndex()].bulletName.text);
+            }
+
         }
+        else
+        {
+            Debug.LogWarning("No bullet Selected!");
+        }
+
     }
 
     Vector3 PointPosition(float t)
@@ -69,14 +93,12 @@ public class Aim_Mechanics : MonoBehaviour
         Vector3 position = bulletPoint.position + direction.normalized * Power * t + 0.5f * gravity * (t * t);
         return position;
     }
-
-
-
-    // Method to change power with the slider
+// Method to change power with the slider
     public void ChangePower()
     {
         Power = PowerSlider.value;
         UpdatePowerValueText();
+        Debug.Log("Power changed to: " + Power + " for player: " + gameObject.name);
     }
 
     // Method to update the power value in the text box
@@ -84,9 +106,23 @@ public class Aim_Mechanics : MonoBehaviour
     {
         powerValueText.text = "Power: " + Power.ToString("0");
     }
+    private void OnDestroy()
+    {
+        TurnBasedManager.OnTurnChanged -= OnTurnChanged;
+    }
 
-
-
-
-
+    private void OnTurnChanged(int players, GameObject newPlayer)
+    {
+        if (newPlayer == gameObject)
+        {
+            PowerSlider.value = Power; // Sync slider with power value
+            UpdatePowerValueText();
+            //PowerSlider.interactable = true; // Enable slider for the active player
+            Debug.Log("Turn changed to: " + gameObject.name + " with power: " + Power);
+        }
+        else
+        {
+            //PowerSlider.interactable = false; // Disable slider for inactive players
+        }
+    }
 }

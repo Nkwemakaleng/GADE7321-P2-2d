@@ -15,31 +15,40 @@ public class CameraController : MonoBehaviour
     private GameObject currentTargetPlayer; // Current target player to follow
     private TurnBasedManager turnManager;
 
-
     private void Start()
     {
-        //turnBasedManager.currentPlayerIndex
         cam = GetComponent<Camera>();
         if (cam == null)
         {
             Debug.LogError("Camera component is missing.");
             return;
         }
+
+        turnManager = FindObjectOfType<TurnBasedManager>();
+        if (turnManager == null)
+        {
+            Debug.LogError("TurnBasedManager not found in the scene.");
+            return;
+        }
+
+        players = turnManager.players;
         if (players == null || players.Length == 0)
         {
             Debug.LogError("Players array is not set or empty.");
             return;
         }
-        TurnBasedManager.OnTurnChanged += UpdateTargetPlayer;
-        // Get initial player list from TurnBasedManager
-        TurnBasedManager turnManager = FindObjectOfType<TurnBasedManager>();
-        if (turnManager != null)
-        {
-            players = turnManager.players;
-            currentPlayerIndex = turnManager.GetCurrentPlayerIndex();
-        }
 
-        UpdateTargetPlayer(players[currentPlayerIndex]);
+        currentPlayerIndex = turnManager.GetCurrentPlayerIndex();
+        TurnBasedManager.OnTurnChanged += UpdateTargetPlayer;
+        
+        if (players.Length > 0 && players[currentPlayerIndex] != null)
+        {
+            UpdateTargetPlayer(currentPlayerIndex, players[currentPlayerIndex]);
+        }
+        else
+        {
+            Debug.LogError("Initial target player is null.");
+        }
     }
 
     private void Update()
@@ -48,13 +57,12 @@ public class CameraController : MonoBehaviour
         FollowPlayer();
 
         // Switch player on specific conditions
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.Q) || turnManager.GetRemainingTime() <= 0)
         {
             SwitchToNextPlayer();
         }
     }
 
-    // Handles camera zoom based on the slider value and mouse scroll wheel input
     private void HandleZoom()
     {
         if (zoomSlider == null)
@@ -73,51 +81,44 @@ public class CameraController : MonoBehaviour
         cam.orthographicSize = zoom;
     }
 
-    // Smoothly follows the current player
     private void FollowPlayer()
     {
-        if (players == null || players.Length == 0 || players[currentPlayerIndex] == null)
+        if (currentTargetPlayer == null)
         {
             Debug.LogWarning("No valid player to follow.");
             return;
         }
 
-        Vector3 targetPosition = new Vector3(players[currentPlayerIndex].transform.position.x, players[currentPlayerIndex].transform.position.y, transform.position.z);
+        Vector3 targetPosition = new Vector3(currentTargetPlayer.transform.position.x, currentTargetPlayer.transform.position.y, transform.position.z);
         transform.position = Vector3.Lerp(transform.position, targetPosition, followSpeed * Time.deltaTime);
     }
 
-    // Sets the camera position to the current player
     private void SetCameraPosition()
     {
-        if (players == null || players.Length == 0 || players[currentPlayerIndex] == null)
+        if (currentTargetPlayer == null)
         {
             Debug.LogWarning("No valid player to set camera position.");
             return;
         }
-        transform.position = new Vector3(players[currentPlayerIndex].transform.position.x, players[currentPlayerIndex].transform.position.y, transform.position.z);
+        transform.position = new Vector3(currentTargetPlayer.transform.position.x, currentTargetPlayer.transform.position.y, transform.position.z);
     }
 
-    // Switches to the next player in the list
     private void SwitchToNextPlayer()
     {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.Length;
-        SetCameraPosition();
+        UpdateTargetPlayer(currentPlayerIndex, players[currentPlayerIndex]);
     }
-    private void UpdateTargetPlayer(GameObject newTargetPlayer)
+
+    private void UpdateTargetPlayer(int targetPlayerIndex, GameObject newTargetPlayer)
     {
+        currentPlayerIndex = targetPlayerIndex;
         currentTargetPlayer = newTargetPlayer;
         SetCameraPosition();
     }
+
     private void OnDestroy()
     {
-        TurnBasedManager.OnTurnChanged -= UpdateTargetPlayer; // Unsubscribe from the turn change event
+        TurnBasedManager.OnTurnChanged -= UpdateTargetPlayer;
     }
-    private void OnTurnChanged(int playerIndex, GameObject newPlayer)
-    {
-        currentPlayerIndex = playerIndex;
-        SetCameraPosition();
-    }
-    
-    
-
 }
+

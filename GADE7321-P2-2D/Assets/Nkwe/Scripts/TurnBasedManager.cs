@@ -8,11 +8,12 @@ public class TurnBasedManager : MonoBehaviour
     [SerializeField] private float turnDuration = 10f; // Duration of each turn in seconds
     public int currentPlayerIndex = 0; // Index of the current player
     private float remainingTurnTime; // Remaining time for the current turn
-    public static event Action<GameObject> OnTurnChanged; // Event for turn change
+    public static event Action<int, GameObject> OnTurnChanged; // Event for turn change
 
     [SerializeField] private TMP_Text turnText;
     [SerializeField] private TMP_Text turnDurationText;
 
+    private Player1 player1;
     // Start is called before the first frame update
     void Start()
     {
@@ -31,12 +32,13 @@ public class TurnBasedManager : MonoBehaviour
             Debug.Log("Player " + (currentPlayerIndex + 1) + "'s turn");
             turnText.text = "Player: " + players[currentPlayerIndex].name;
 
-            OnTurnChanged?.Invoke(players[currentPlayerIndex]);
+            OnTurnChanged?.Invoke(currentPlayerIndex, players[currentPlayerIndex]);
         }
         else
         {
             Debug.LogError("Player at index " + currentPlayerIndex + " is null.");
         }
+        NotifyTurnChanged();
     }
 
     // Update is called once per frame
@@ -68,8 +70,7 @@ public class TurnBasedManager : MonoBehaviour
             turnText.text = "Player: " + players[currentPlayerIndex].name;
 
             // Notify subscribers about the turn change
-            OnTurnChanged?.Invoke(players[currentPlayerIndex]);
-           // OnTurnChanged?.Invoke(currentPlayerIndex, players[currentPlayerIndex]);
+            OnTurnChanged?.Invoke(currentPlayerIndex,players[currentPlayerIndex]);
         }
         else
         {
@@ -83,11 +84,13 @@ public class TurnBasedManager : MonoBehaviour
         if (players[currentPlayerIndex] != null)
         {
             SetPlayerControl(players[currentPlayerIndex], false);
+            
         }
 
         currentPlayerIndex = (currentPlayerIndex + 1) % players.Length;
 
         StartTurn();
+        NotifyTurnChanged();
     }
 
     // Method to enable or disable player controls
@@ -125,5 +128,22 @@ public class TurnBasedManager : MonoBehaviour
     public int GetCurrentPlayerIndex()
     {
         return currentPlayerIndex;
+    }
+
+    public float GetRemainingTime()
+    {
+        return remainingTurnTime;
+    }
+    public void OnEndTurnButtonClicked()
+    {
+        EndTurn();
+    }
+    
+    private void NotifyTurnChanged()
+    {
+        if (OnTurnChanged != null)
+        {
+            OnTurnChanged(currentPlayerIndex, players[currentPlayerIndex]);
+        }
     }
 }

@@ -16,6 +16,9 @@ public class Player1 : MonoBehaviour
     public GameObject respawnPoint; // Respawn point for automatic respawn
     public float respawnHeight = 10f; // Height for respawning if player falls
     public KeyCode respawnKey = KeyCode.R; // Key to trigger manual respawn
+    public int respawnAmounts;
+    public int respawnAmountsLeft;
+    public TMP_Text respawnAmountText;
 
 
     private bool isRespawning = false; // Flag to track if the player is respawning
@@ -30,15 +33,19 @@ public class Player1 : MonoBehaviour
     public bool jetpackEnabled = true;
     public float jetpackForce = 5f;
     public KeyCode jetpackKey = KeyCode.E; // Key to trigger jetpack1
+    private BulletManager bulletManager;
+    private TurnBasedManager turnManager;
 
     void Start()
     {
-        //add global to check if its the players turn.
+        
         remainingMovement = maxMovement;
         rb = GetComponent<Rigidbody2D>();
 
         currentHealth = maxHealth;
+        respawnAmountsLeft = respawnAmounts;
         UpdateHealthUI();
+        UpdateRespawnText();
 
     }
 
@@ -88,22 +95,25 @@ public class Player1 : MonoBehaviour
     {
         if (other.CompareTag("Bullet"))
         {
-            BulletHit(20); // Player loses 40 health when hit by a bullet
+            BulletHit(BulletHit(bulletManager.bulletTypes[bulletManager.GetCurrentBulletIndex()].damage)); // Apply the damage from the bullet
+            Destroy(other.gameObject); // Optionally destroy the bullet on hit); 
+            Debug.Log("Hit");
         }
     }
     // Method to handle player being hit by a bullet
-    void BulletHit(int damage)
+    public int BulletHit(int damage)
     {
         if (!isRespawning)
         {
             currentHealth -= damage; // Decrease player's health by the damage amount
-
             UpdateHealthUI(); // Update health UI
             if (currentHealth <= 0)
             {
                 Die(); // Die if health reaches zero
             }
         }
+        return currentHealth;
+        
     }
 
     // Method to handle player death
@@ -138,19 +148,42 @@ public class Player1 : MonoBehaviour
         {
             if (currentHealth <= 0)
             {
-                // Automatic respawn at respawn point if player dies
-                transform.position = respawnPoint.transform.position;
-                transform.rotation = Quaternion.identity;
+                if (respawnAmountsLeft > 0 )
+                {
+                    // Automatic respawn at respawn point if player dies
+                    transform.position = respawnPoint.transform.position;
+                    transform.rotation = Quaternion.identity;
+                    respawnAmountsLeft -= 1;
+                    UpdateRespawnText();
+                }
+                else
+                {
+                    Debug.Log("Not enough Lives Left");
+                    DestroyThisObject();// win logic in this case 
+                }
             }
             else
             {
-                // Manual respawn at higher altitude
-                Vector3 respawnPos = new Vector3(transform.position.x, respawnHeight, transform.position.z);
-                transform.position = respawnPos;
-                transform.rotation = Quaternion.identity;
+                if (respawnAmountsLeft > 0)
+                {
+                    // Manual respawn at higher altitude
+                    Vector3 respawnPos = new Vector3(transform.position.x, respawnHeight, transform.position.z);
+                    transform.position = respawnPos;
+                    transform.rotation = Quaternion.identity;
+                    respawnAmountsLeft -= 1;
+                    UpdateRespawnText();
+                }
+                else
+                {
+                    Debug.Log("No enough respawns left for automatic respawn");
+                    DestroyThisObject();
+                }
+                
+                
             }
             currentHealth = maxHealth; // Reset player's health
             UpdateHealthUI(); // Update health UI
+            UpdateRespawnText();
         }
     }
 
@@ -160,4 +193,16 @@ public class Player1 : MonoBehaviour
         healthText.text = "Health: " + currentHealth.ToString();
 
     }
+
+    void UpdateRespawnText()
+    {
+        
+        respawnAmountText.text = "Respawn " + this.gameObject.name + " :"+ Mathf.Max(respawnAmountsLeft, 0).ToString();;
+    }
+
+    void DestroyThisObject()
+    {
+        Destroy(this.gameObject);
+    }
+
 }
