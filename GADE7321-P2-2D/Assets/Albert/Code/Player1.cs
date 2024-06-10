@@ -21,7 +21,7 @@ public class Player1 : MonoBehaviour
     private bool isRespawning = false; // Flag to track if the player is respawning
     //movement
     public float moveSpeed = 5f; // Speed of player movement
-    public int maxMovement = 100; // Maximum movement distance
+    public int maxMovement = 10; // Maximum movement distance
     public bool playersturn = true;
     private int remainingMovement; // Remaining movement distance
     Rigidbody2D rb;

@@ -1,51 +1,153 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class TurnBasedManager : MonoBehaviour
 {
-    [SerializeField] public GameObject[] players; // Array of player GameObjects
-    private int currentPlayerIndex = 0; // Index of the current player
+    public GameObject[] players; // Array of player GameObjects
+    [SerializeField] private float turnDuration = 10f; // Duration of each turn in seconds
+    public int currentPlayerIndex = 0; // Index of the current player
+    private float remainingTurnTime; // Remaining time for the current turn
+    public static event Action<int, GameObject> OnTurnChanged; // Event for turn change
 
+    [SerializeField] private TMP_Text turnText;
+    [SerializeField] private TMP_Text turnDurationText;
+
+    private BulletManager bulletManager;
     // Start is called before the first frame update
     void Start()
     {
-        // Initialize turn by starting with the first player
-        StartTurn();
+        TurnBasedManager.OnTurnChanged += OnTurnChanged;
+        remainingTurnTime = turnDuration;
+
+        // Ensure all player controls are disabled first
+        foreach (var player in players)
+        {
+            SetPlayerControl(player, false);
+        }
+
+        // Enable controls for the current player
+        if (players[currentPlayerIndex] != null)
+        {
+            SetPlayerControl(players[currentPlayerIndex], true);
+            Debug.Log("Player " + (currentPlayerIndex + 1) + "'s turn");
+            turnText.text = "Player: " + players[currentPlayerIndex].name;
+
+            OnTurnChanged?.Invoke(currentPlayerIndex, players[currentPlayerIndex]);
+        }
+        else
+        {
+            Debug.LogError("Player at index " + currentPlayerIndex + " is null.");
+        }
+        NotifyTurnChanged();
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Check for end of turn condition (e.g., player action)
-        if (Input.GetKeyDown(KeyCode.Space))
+        // Update the remaining turn time
+        remainingTurnTime -= Time.deltaTime;
+        turnDurationText.text = "Time: " + Mathf.Max(remainingTurnTime, 0).ToString("F2"); // Update UI
+
+        if (remainingTurnTime <= 0 || Input.GetKeyDown(KeyCode.Q))
         {
             EndTurn();
         }
     }
 
     // Start the turn for the current player
-    void StartTurn()
+    private void StartTurn()
     {
-        // Activate player controls
-        players[currentPlayerIndex].GetComponent<Player1>().enabled = true;
-        players[currentPlayerIndex].GetComponent<Aim_Mechanics>().enabled =true;
-        Debug.Log("Player " + (currentPlayerIndex + 1) + "'s turn");
+        // Reset the turn timer
+        remainingTurnTime = turnDuration;
+
+        // Ensure the player exists before enabling controls
+        if (players[currentPlayerIndex] != null)
+        {
+            SetPlayerControl(players[currentPlayerIndex], true);
+            Debug.Log("Player " + (currentPlayerIndex + 1) + "'s turn");
+
+            // Update UI
+            turnText.text = "Player: " + players[currentPlayerIndex].name;
+
+            // Notify subscribers about the turn change
+            OnTurnChanged?.Invoke(currentPlayerIndex, players[currentPlayerIndex]);
+        }
+        else
+        {
+            Debug.LogError("Player at index " + currentPlayerIndex + " is null.");
+        }
     }
 
     // End the turn for the current player
-    void EndTurn()
+    public void EndTurn()
     {
-        // Deactivate player controls
-        players[currentPlayerIndex].GetComponent<Player1>().enabled = false; 
-        players[currentPlayerIndex].GetComponent<Aim_Mechanics>().enabled = false;
-        
+        if (players[currentPlayerIndex] != null)
+        {
+            SetPlayerControl(players[currentPlayerIndex], false);
 
-        // Move to the next player
+        }
         currentPlayerIndex = (currentPlayerIndex + 1) % players.Length;
-
-        // Start the next player's turn
         StartTurn();
+        NotifyTurnChanged();
+
     }
+
+    // Method to enable or disable player controls
+    private void SetPlayerControl(GameObject player, bool isEnabled)
+    {
+        if (player == null)
+        {
+            Debug.LogError("Player object is null.");
+            return;
+        }
+
+        var player1Component = player.GetComponent<Player1>();
+        var aimMechanicsComponent = player.GetComponentInChildren<Aim_Mechanics>();
+
+        if (player1Component != null)
+        {
+            player1Component.enabled = isEnabled;
+        }
+        else
+        {
+            Debug.LogError("Player1 component is missing on player " + player.name);
+        }
+
+        if (aimMechanicsComponent != null)
+        {
+            aimMechanicsComponent.enabled = isEnabled;
+        }
+        else
+        {
+            Debug.LogError("Aim_Mechanics component is missing on player " + player.name);
+        }
+    }
+
+    // Public method to get the current player index
+    public int GetCurrentPlayerIndex()
+    {
+        return currentPlayerIndex;
+    }
+
+    public float GetRemainingTime()
+    {
+        return remainingTurnTime;
+    }
+    public void OnEndTurnButtonClicked()
+    {
+        EndTurn();
+    }
+
+    private void NotifyTurnChanged()
+    {
+        if (OnTurnChanged != null)
+        {
+            OnTurnChanged(currentPlayerIndex, players[currentPlayerIndex]);
+        }
+    }
+
 }
