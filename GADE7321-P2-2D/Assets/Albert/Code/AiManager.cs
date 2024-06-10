@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class AiManager : MonoBehaviour
@@ -17,7 +16,7 @@ public class AiManager : MonoBehaviour
     public int maxMovement = 10;
     public bool aiTurn = false;
     private int remainingMovement;
-    Rigidbody2D rb;
+    private Rigidbody2D rb;
     public AIAimMechanics aiAimMechanics;
     private GameObject player;
     public int respawnAmounts;
@@ -25,6 +24,11 @@ public class AiManager : MonoBehaviour
     public TMP_Text respawnAmountText;
     [SerializeField] private BulletManager bulletManager;
     [SerializeField] private TurnBasedManager turnManager;
+
+    private bool shouldMove = false;
+    private Vector3 movePosition;
+    private bool movedCloser = false;
+    private bool movedAway = false;
 
     void Start()
     {
@@ -87,14 +91,52 @@ public class AiManager : MonoBehaviour
                 aiTurn = aiTurn
             };
 
-            Vector2 bestMove = GetBestMove(currentState, 3);
-            Vector2 direction = (bestMove - (Vector2)transform.position).normalized;
-            rb.MovePosition(rb.position + direction * moveSpeed * Time.fixedDeltaTime);
-            remainingMovement -= Mathf.Abs((int)(direction.magnitude));
-            if (remainingMovement <= 0)
+            // Check if the AI should move
+            if (shouldMove)
             {
-                aiAimMechanics.AIUpdate(); // AI aims and shoots
-                aiTurn = false;
+                if (!movedCloser)
+                {
+                    // Move closer to the player
+                    movePosition = transform.position + (player.transform.position - transform.position).normalized;
+                    movedCloser = true;
+                }
+                else if (!movedAway)
+                {
+                    // Move away from the player
+                    movePosition = transform.position - (player.transform.position - transform.position).normalized;
+                    movedAway = true;
+                }
+                else
+                {
+                    // Move to an advantageous position and end turn
+                    movePosition = FindAdvantageousPosition();
+                    aiTurn = false;
+                }
+
+                // Move towards the desired position
+                Vector2 direction = (movePosition - transform.position).normalized;
+                rb.MovePosition(rb.position + direction * moveSpeed * Time.fixedDeltaTime);
+                remainingMovement -= Mathf.Abs((int)(direction.magnitude));
+                if (remainingMovement <= 0)
+                {
+                    shouldMove = false; // Reset shouldMove flag
+                    movedCloser = false; // Reset movement flags
+                    movedAway = false; // Reset movement flags
+                    aiAimMechanics.AIUpdate(); // AI aims and shoots
+                    aiTurn = false;
+                }
+            }
+            else
+            {
+                Vector2 bestMove = GetBestMove(currentState, 3);
+                Vector2 direction = (bestMove - (Vector2)transform.position).normalized;
+                rb.MovePosition(rb.position + direction * moveSpeed * Time.fixedDeltaTime);
+                remainingMovement -= Mathf.Abs((int)(direction.magnitude));
+                if (remainingMovement <= 0)
+                {
+                    aiAimMechanics.AIUpdate(); // AI aims and shoots
+                    aiTurn = false;
+                }
             }
         }
         else
@@ -199,14 +241,14 @@ public class AiManager : MonoBehaviour
                 DestroyThisObject();
             }
         }
-        currentHealth = maxHealth; // Reset player's health
+        currentHealth = maxHealth; // Reset Ai's health
         UpdateHealthUI(); // Update health UI
         UpdateRespawnText();
     }
 
     void UpdateHealthUI()
     {
-        healthText.text = "Health: " + currentHealth.ToString();
+        healthText.text = currentHealth.ToString();
     }
 
     void UpdateRespawnText()
@@ -285,4 +327,25 @@ public class AiManager : MonoBehaviour
         };
         return newState;
     }
+
+    Vector3 FindAdvantageousPosition()
+    {
+        // Implement logic to find an advantageous position
+        // For simplicity, let's say it moves 5 units to the right
+        return transform.position + Vector3.right * 5f;
+    }
+
+    public void SetShouldMove(bool shouldMove)
+    {
+        this.shouldMove = shouldMove;
+    }
+}
+
+public struct GameState
+{
+    public Vector2 aiPosition;
+    public Vector2 playerPosition;
+    public int aiHealth;
+    public int playerHealth;
+    public bool aiTurn;
 }

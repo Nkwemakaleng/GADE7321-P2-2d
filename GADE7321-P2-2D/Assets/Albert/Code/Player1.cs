@@ -99,18 +99,6 @@ public class Player1 : MonoBehaviour
             Debug.Log("Hit");
         }
     }
-
-    /*void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Bullet"))
-        {
-            BulletHit(BulletHit(bulletManager.bulletTypes[bulletManager.GetCurrentBulletIndex()].damage)); // Apply the damage from the bullet
-            Destroy(other.gameObject); // Optionally destroy the bullet on hit); 
-            Debug.Log("Hit");
-        }
-    }*/
-    // Method to handle player being hit by a bullet
-
     public int BulletHit(int damage)
     {
         if (!isRespawning)
@@ -194,14 +182,14 @@ public class Player1 : MonoBehaviour
     // Method to update health UI
     void UpdateHealthUI()
     {
-        healthText.text = "Health: " + currentHealth.ToString();
+        healthText.text = currentHealth.ToString();
 
     }
 
     void UpdateRespawnText()
     {
 
-        respawnAmountText.text = "Respawn " + this.gameObject.name + " :" + Mathf.Max(respawnAmountsLeft, 0).ToString(); ;
+        respawnAmountText.text = "Respawn " + this.gameObject.name + " :" + Mathf.Max(respawnAmountsLeft, 0).ToString(); 
     }
 
     void DestroyThisObject()

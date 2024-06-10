@@ -19,9 +19,18 @@ public class TurnBasedManager : MonoBehaviour
     [SerializeField] private TMP_Text turnText;
     [SerializeField] private TMP_Text turnDurationText;
 
+    public static TurnBasedManager Instance { get; private set; }
+    private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+        }
     private void Start()
     {
-        remainingTurnTime = turnDuration;
+        
+            remainingTurnTime = turnDuration;
 
         // Ensure all player controls are disabled first
         foreach (var player in players)

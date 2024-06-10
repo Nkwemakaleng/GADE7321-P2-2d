@@ -1,36 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using static UnityEngine.GraphicsBuffer;
 
 public class AIAimMechanics : MonoBehaviour
 {
     public GameObject Bullet1;
-    public float Power = 10;
-    public Slider PowerSlider;
     public Transform bulletPoint;
-    public GameObject Point;
-    public int numOfPoints = 10;
-    public float spacing = 0.5f;
+    public float initialPower = 10f;
+    public float maxPower = 100f;
+    public float moveThreshold = 10f;
+    public GameObject TargetPrefab;
+    public AiManager aiManager;
     public TextMeshProUGUI powerValueText;
 
-    private GameObject[] points;
     private Vector3 direction;
-    private AiManager aiManager;
-    private Vector3 playerPosition;
+    private GameObject empty;
+    private float currentPower;
 
     private void Start()
     {
-        points = new GameObject[numOfPoints];
-        for (int i = 0; i < numOfPoints; i++)
-        {
-            points[i] = Instantiate(Point, bulletPoint.position, Quaternion.identity);
-        }
-        PowerSlider.value = Power;
+        currentPower = initialPower;
         UpdatePowerValueText();
-
-        aiManager = GetComponent<AiManager>();
     }
 
     private void Update()
@@ -39,16 +31,17 @@ public class AIAimMechanics : MonoBehaviour
         {
             AIUpdate();
         }
-
-        for (int i = 0; i < numOfPoints; i++)
+        // Adjust the cannon direction to look at the target
+        if (TargetPrefab != null)
         {
-            points[i].transform.position = PointPosition(i * spacing);
+            Vector3 cannonPosition = transform.position;
+            direction = TargetPrefab.transform.position - cannonPosition;
+            transform.right = direction;
         }
     }
 
     public void AIUpdate()
     {
-        Vector3 aiPosition = transform.position;
         GameObject playerObject = GameObject.Find("Player1");
 
         // Check if player object exists
@@ -58,26 +51,24 @@ public class AIAimMechanics : MonoBehaviour
             return;
         }
 
-        playerPosition = playerObject.transform.position;
+        Vector3 playerPosition = playerObject.transform.position;
+        Vector3 aiPosition = transform.position;
 
         // Calculate direction towards the player
         direction = playerPosition - aiPosition;
 
-        // Adjust direction for the arc
-        float distance = Vector3.Distance(aiPosition, playerPosition);
-        float timeToHit = Mathf.Sqrt((2 * distance) / Physics2D.gravity.magnitude);
+        // Spawn empty if it doesn't exist
+        if (empty == null)
+        {
+            empty = Instantiate(TargetPrefab, playerPosition, Quaternion.identity);
+        }
 
-        // Calculate the aim point based on the player's velocity
-        Vector3 aimPoint = playerObject.transform.position + (Vector3)(playerObject.GetComponent<Rigidbody2D>().velocity * timeToHit);
-
-        // Update direction based on the aim point
-        direction = aimPoint - bulletPoint.position;
-
-        // Rotate the AI towards the predicted position
-        transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
-        transform.right = direction.normalized;
+        // Move the empty upwards
+        Vector3 targetUpPosition = empty.transform.position + Vector3.up * 10f;
+        empty.transform.position = Vector3.MoveTowards(empty.transform.position, targetUpPosition, 6f * Time.deltaTime);
 
         // Adjust power based on the distance
+        float distance = Vector3.Distance(aiPosition, playerPosition);
         AdjustPower(distance);
 
         // Determine if the shot will hit the player
@@ -85,8 +76,17 @@ public class AIAimMechanics : MonoBehaviour
         {
             Shoot();
         }
+        else
+        {
+            // Check if the empty has moved away
+            float emptyDistance = Vector3.Distance(empty.transform.position, playerPosition);
+            if (emptyDistance > moveThreshold)
+            {
+                // Set shouldMove to true in AiManager
+                aiManager.SetShouldMove(true);
+            }
+        }
     }
-
 
     public void Shoot()
     {
@@ -94,51 +94,38 @@ public class AIAimMechanics : MonoBehaviour
         Rigidbody2D bulletRB = newBullet.GetComponent<Rigidbody2D>();
         if (bulletRB != null)
         {
-            bulletRB.velocity = direction.normalized * Power;
+            bulletRB.velocity = direction.normalized * currentPower;
         }
-    }
-
-    private Vector3 PointPosition(float t)
-    {
-        Vector3 gravity = new Vector3(Physics2D.gravity.x, Physics2D.gravity.y, 0f);
-        Vector3 position = bulletPoint.position + direction.normalized * Power * t + 0.5f * gravity * (t * t);
-        return position;
     }
 
     private void AdjustPower(float distance)
     {
-        Power = Mathf.Clamp(distance / 10, 5, 20); // Adjust power based on distance
-        PowerSlider.value = Power;
+        currentPower = Mathf.Clamp(distance / 10f, initialPower, maxPower); // Adjust power based on distance
         UpdatePowerValueText();
     }
 
     private bool WillHitPlayer(Vector3 playerPosition)
     {
-        Vector2 bulletVelocity = direction.normalized * Power;
-        Vector2 gravity = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
-        Vector2 predictedPosition = bulletPoint.position;
+        Vector3 bulletVelocity = direction.normalized * currentPower;
+        Vector3 gravity = new Vector3(Physics2D.gravity.x, Physics2D.gravity.y, 0f);
+        Vector3 predictedPosition = bulletPoint.position;
 
-        for (int i = 0; i < numOfPoints; i++)
+        while (Vector3.Distance(predictedPosition, playerPosition) > 0.5f)
         {
             predictedPosition += bulletVelocity * Time.fixedDeltaTime;
             bulletVelocity += gravity * Time.fixedDeltaTime;
 
-            if (Vector2.Distance(predictedPosition, playerPosition) < 0.5f)
+            // If predicted position moves too far, return false
+            if (Vector3.Distance(predictedPosition, aiManager.gameObject.transform.position) > moveThreshold)
             {
-                return true;
+                return false;
             }
         }
-        return false;
-    }
-
-    public void ChangePower()
-    {
-        Power = PowerSlider.value;
-        UpdatePowerValueText();
+        return true;
     }
 
     private void UpdatePowerValueText()
     {
-        powerValueText.text = Power.ToString("0");
+        powerValueText.text = currentPower.ToString("0");
     }
 }
