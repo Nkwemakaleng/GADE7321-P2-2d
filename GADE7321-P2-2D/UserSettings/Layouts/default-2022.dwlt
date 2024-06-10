@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1536
     height: 772.8
   m_ShowMode: 4
-  m_Title: Project
+  m_Title: Hierarchy
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 531}
   m_MaxSize: {x: 10000, y: 10000}
@@ -439,9 +439,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: fc0c0000
+      m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 1afbffff60610000
+      m_ExpandedIDs: daecffffa8f0ffffd2f2ffff86f3ffff4af4ffff38f7ffffa2f7ffff32f8ffff1afbffff16740000ce740000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -763,9 +763,9 @@ MonoBehaviour:
       floating: 0
       collapsed: 0
       displayed: 1
-      snapOffset: {x: -359.2, y: -414.4}
+      snapOffset: {x: 595.2, y: 10.399994}
       snapOffsetDelta: {x: 0, y: 0}
-      snapCorner: 3
+      snapCorner: 0
       id: UnityEditor.SceneViewCameraOverlay
       index: 11
       layout: 4
@@ -886,9 +886,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 899.8208, y: 425.3937, z: -3.713072}
+    m_Target: {x: -141.00575, y: 7.991819, z: -0.26030523}
     speed: 2
-    m_Value: {x: 899.8208, y: 425.3937, z: -3.713072}
+    m_Value: {x: -141.00575, y: 7.991819, z: -0.26030523}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -938,9 +938,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 375.9112
+    m_Target: 30.634644
     speed: 2
-    m_Value: 375.9112
+    m_Value: 30.634644
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -1114,7 +1114,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Albert/Code
+    - Assets/Scenes
     m_Globs: []
     m_OriginalText: 
     m_ImportLogFlags: 0
@@ -1122,15 +1122,15 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/Albert/Code
+  - Assets/Scenes
   m_LastFoldersGridSize: 16
   m_LastProjectPath: C:\Users\alber\Documents\GitHub\GADE7321-P2-2d\GADE7321-P2-2D
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 42640000
-    m_LastClickedID: 25666
+    scrollPos: {x: 0, y: 23.800018}
+    m_SelectedIDs: 4c640000
+    m_LastClickedID: 25676
     m_ExpandedIDs: 000000002a6400002c6400002e64000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -1190,15 +1190,15 @@ MonoBehaviour:
     m_ExpandedInstanceIDs: c6230000306500002ea4000000000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: AIAimMechanics
-      m_OriginalName: AIAimMechanics
+      m_Name: Albert'sTesting
+      m_OriginalName: Albert'sTesting
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 3324
+      m_UserData: 25774
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
       m_OriginalEventType: 0

@@ -6,7 +6,6 @@ using TMPro;
 
 public class AIAimMechanics : MonoBehaviour
 {
-    
     public GameObject Bullet1;
     public float Power = 10;
     public Slider PowerSlider;
@@ -19,6 +18,7 @@ public class AIAimMechanics : MonoBehaviour
     private GameObject[] points;
     private Vector3 direction;
     private AiManager aiManager;
+    private Vector3 playerPosition;
 
     private void Start()
     {
@@ -49,15 +49,35 @@ public class AIAimMechanics : MonoBehaviour
     public void AIUpdate()
     {
         Vector3 aiPosition = transform.position;
-        Vector3 playerPosition = GameObject.Find("Player1").transform.position;
+        GameObject playerObject = GameObject.Find("Player1");
+
+        // Check if player object exists
+        if (playerObject == null)
+        {
+            Debug.LogWarning("Player1 GameObject not found!");
+            return;
+        }
+
+        playerPosition = playerObject.transform.position;
 
         // Calculate direction towards the player
         direction = playerPosition - aiPosition;
-        transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
-        transform.right = direction;
 
-        // Adjust power if needed
+        // Adjust direction for the arc
         float distance = Vector3.Distance(aiPosition, playerPosition);
+        float timeToHit = Mathf.Sqrt((2 * distance) / Physics2D.gravity.magnitude);
+
+        // Calculate the aim point based on the player's velocity
+        Vector3 aimPoint = playerObject.transform.position + (Vector3)(playerObject.GetComponent<Rigidbody2D>().velocity * timeToHit);
+
+        // Update direction based on the aim point
+        direction = aimPoint - bulletPoint.position;
+
+        // Rotate the AI towards the predicted position
+        transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
+        transform.right = direction.normalized;
+
+        // Adjust power based on the distance
         AdjustPower(distance);
 
         // Determine if the shot will hit the player
@@ -66,6 +86,7 @@ public class AIAimMechanics : MonoBehaviour
             Shoot();
         }
     }
+
 
     public void Shoot()
     {
@@ -93,15 +114,16 @@ public class AIAimMechanics : MonoBehaviour
 
     private bool WillHitPlayer(Vector3 playerPosition)
     {
-        Vector3 bulletVelocity = direction.normalized * Power;
-        Vector3 predictedPosition = bulletPoint.position;
+        Vector2 bulletVelocity = direction.normalized * Power;
+        Vector2 gravity = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y);
+        Vector2 predictedPosition = bulletPoint.position;
 
         for (int i = 0; i < numOfPoints; i++)
         {
-            predictedPosition += (Vector3)bulletVelocity * Time.fixedDeltaTime;
-            bulletVelocity += (Vector3)Physics2D.gravity * Time.fixedDeltaTime;
+            predictedPosition += bulletVelocity * Time.fixedDeltaTime;
+            bulletVelocity += gravity * Time.fixedDeltaTime;
 
-            if (Vector3.Distance(predictedPosition, playerPosition) < 0.5f)
+            if (Vector2.Distance(predictedPosition, playerPosition) < 0.5f)
             {
                 return true;
             }

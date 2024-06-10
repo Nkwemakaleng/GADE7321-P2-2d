@@ -8,13 +8,22 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
+  - enabled: 0
     path: Assets/Nkwe/Main Menu.unity
     guid: 342d2fa876966f44999d79a8d17cfd03
-  - enabled: 1
+  - enabled: 0
     path: Assets/Nkwe/Single Player.unity
     guid: 12614165f77dd6e4ebf3082b5c9fbff4
   - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: a1ad378fdb3f3f8419e1d513a4bd5997
+  - enabled: 1
     path: Assets/Scenes/Albert'sTesting.unity
     guid: 163f750157146964fac1ae1c34fe98f3
+  - enabled: 1
+    path: Assets/Scenes/One-V-One.unity
+    guid: df966f42bf467c94ca1e77a4ff32913b
+  - enabled: 1
+    path: Assets/Scenes/Reinforce.unity
+    guid: 1504094949213e9409c03de6db238f24
   m_configObjects: {}
