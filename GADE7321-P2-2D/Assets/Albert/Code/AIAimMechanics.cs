@@ -5,7 +5,7 @@ using TMPro;
 
 public class AIAimMechanics : MonoBehaviour
 {
-    public GameObject Bullet1;
+   
     public Transform bulletPoint;
     public float initialPower = 10f;
     public float maxPower = 100f;
@@ -19,6 +19,7 @@ public class AIAimMechanics : MonoBehaviour
     private float currentPower;
     private bool shouldIncreasePower = false;
 
+    [SerializeField] private BulletManager bulletManager;
     private void Start()
     {
         currentPower = initialPower;
@@ -81,11 +82,30 @@ public class AIAimMechanics : MonoBehaviour
 
     public void Shoot()
     {
-        GameObject newBullet = Instantiate(Bullet1, bulletPoint.position, Quaternion.identity);
-        Rigidbody2D bulletRB = newBullet.GetComponent<Rigidbody2D>();
-        if (bulletRB != null)
+        GameObject currentBullet = bulletManager.GetCurrentBullet();
+        bulletManager.updateBulletText();
+        if (currentBullet != null)
         {
-            bulletRB.velocity = direction.normalized * currentPower;
+            if (bulletManager.GetCurrentAmount() > 0 )//bulletManager.bulletTypes[bulletManager.GetCurrentBulletIndex()].maxBullets)
+            {
+                GameObject newBullet = Instantiate(currentBullet, bulletPoint.position, Quaternion.identity);
+                Rigidbody2D bulletRB = newBullet.GetComponent<Rigidbody2D>();
+                if (bulletRB != null)
+                {
+                    bulletRB.velocity = direction.normalized * currentPower;
+                }
+                bulletManager.ReduceBulletCount();
+                bulletManager.updateBulletText();
+            }
+            else
+            {
+                Debug.Log("Out of " + bulletManager.bulletTypes[bulletManager.GetCurrentBulletIndex()].bulletName.text);
+            }
+
+        }
+        else
+        {
+            Debug.LogWarning("No bullet Selected!");
         }
     }
 

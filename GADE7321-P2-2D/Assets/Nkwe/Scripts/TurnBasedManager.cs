@@ -5,7 +5,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-
+using Random = UnityEngine.Random;
 
 
 public class TurnBasedManager : MonoBehaviour
@@ -37,7 +37,7 @@ public class TurnBasedManager : MonoBehaviour
         {
             SetPlayerControl(player, false);
         }
-
+        currentPlayerIndex = Random.Range(0, players.Length);
         // Enable controls for the current player
         if (players[currentPlayerIndex] != null)
         {
@@ -107,28 +107,58 @@ public class TurnBasedManager : MonoBehaviour
             Debug.LogError("Player object is null.");
             return;
         }
-
         // Try to find both Aim_Mechanics and AIAimMechanics components
+        var playerComponent = player.GetComponent<Player1>();
         var aimMechanicsComponent = player.GetComponentInChildren<Aim_Mechanics>();
+        var aiManager = player.GetComponent<AiManager>();
         var aiAimMechanicsComponent = player.GetComponentInChildren<AIAimMechanics>();
 
-        // Enable/disable Aim_Mechanics if found
-        if (aimMechanicsComponent != null)
+        if (player.name == "Player1")
         {
-            aimMechanicsComponent.enabled = isEnabled;
-        }
+            if (playerComponent != null)
+            {
+                playerComponent.enabled = isEnabled;
+            }
+            else
+            {
+                Debug.LogError("Player1 component is missing on player " + player.name);
+            }
 
-        // Enable/disable AIAimMechanics if found
-        if (aiAimMechanicsComponent != null)
-        {
-            aiAimMechanicsComponent.enabled = isEnabled;
+            if (aimMechanicsComponent != null)
+            {
+                aimMechanicsComponent.enabled = isEnabled;
+            }
+            else
+            {
+                Debug.LogError("Aim_Mechanics component is missing on player " + player.name);
+            }
         }
+        else
+        {
+                    // Enable/disable Aim_Mechanics if found
+                    if (aiManager != null)
+                    {
+                        aiManager.enabled = isEnabled;
+                        
+                    }
+            
+                    // Enable/disable AIAimMechanics if found
+                    if (aiAimMechanicsComponent != null)
+                    {
+                        aiAimMechanicsComponent.enabled = isEnabled;
+                    }
+            
+                    // Log errors if both components are missing
+                    if (aimMechanicsComponent == null && aiAimMechanicsComponent == null)
+                    {
+                        Debug.LogError("Aim_Mechanics or AIAimMechanics component is missing on player " + player.name);
+                    }
+        }
+         /*else
+        {
+            Debug.Log("Player 2 Not found");
+        }*/
 
-        // Log errors if both components are missing
-        if (aimMechanicsComponent == null && aiAimMechanicsComponent == null)
-        {
-            Debug.LogError("Aim_Mechanics or AIAimMechanics component is missing on player " + player.name);
-        }
     }
 
     // Public method to get the current player index

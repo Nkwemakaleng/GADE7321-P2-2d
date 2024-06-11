@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
+using UnityEngine.UI;
 
 public class AiManager : MonoBehaviour
 {
@@ -24,7 +26,7 @@ public class AiManager : MonoBehaviour
     public TMP_Text respawnAmountText;
     [SerializeField] private BulletManager bulletManager;
     [SerializeField] private TurnBasedManager turnManager;
-
+    public Button endTurbutton; 
     private bool shouldMove = false;
     private Vector3 movePosition;
     private bool movedCloser = false;
@@ -32,6 +34,7 @@ public class AiManager : MonoBehaviour
 
     void Start()
     {
+        Button btn = endTurbutton.GetComponent<Button>();
         respawnAmountsLeft = respawnAmounts;
         if (aiAimMechanics == null)
         {
@@ -110,21 +113,22 @@ public class AiManager : MonoBehaviour
                 {
                     // Move to an advantageous position and end turn
                     movePosition = FindAdvantageousPosition();
-                    aiTurn = false;
+                    Button btn = endTurbutton.GetComponent<Button>();
+                    btn.onClick.AddListener(TaskOnClick);
                 }
-
+ 
                 // Move towards the desired position
                 Vector2 direction = (movePosition - transform.position).normalized;
                 rb.MovePosition(rb.position + direction * moveSpeed * Time.fixedDeltaTime);
                 remainingMovement -= Mathf.Abs((int)(direction.magnitude));
-                if (remainingMovement <= 0)
+                /*if (remainingMovement <= 0)
                 {
                     shouldMove = false; // Reset shouldMove flag
                     movedCloser = false; // Reset movement flags
                     movedAway = false; // Reset movement flags
                     aiAimMechanics.AIUpdate(); // AI aims and shoots
                     aiTurn = false;
-                }
+                }*/
             }
             else
             {
@@ -135,7 +139,8 @@ public class AiManager : MonoBehaviour
                 if (remainingMovement <= 0)
                 {
                     aiAimMechanics.AIUpdate(); // AI aims and shoots
-                    aiTurn = false;
+                    Button btn = endTurbutton.GetComponent<Button>();
+                    btn.onClick.AddListener(TaskOnClick);
                 }
             }
         }
@@ -144,7 +149,10 @@ public class AiManager : MonoBehaviour
             Debug.LogError("AIAimMechanics component is missing on AI.");
         }
     }
-
+    void TaskOnClick()
+    {
+        Debug.Log("The button is pressed");
+    }
     Vector2 GetBestMove(GameState state, int depth)
     {
         Vector2 bestMove = state.aiPosition;
