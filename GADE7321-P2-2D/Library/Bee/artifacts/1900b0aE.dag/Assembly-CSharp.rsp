@@ -380,6 +380,7 @@
 "Assets/Albert/Code/Bullet_Normal.cs"
 "Assets/Albert/Code/ButtonManagerMenu.cs"
 "Assets/Albert/Code/Player1.cs"
+"Assets/Albert/Code/TargetMovement.cs"
 "Assets/Albert/Code/UsesScript.cs"
 "Assets/Nkwe/Scripts/CameraControl.cs"
 "Assets/Nkwe/Scripts/MenuManager.cs"

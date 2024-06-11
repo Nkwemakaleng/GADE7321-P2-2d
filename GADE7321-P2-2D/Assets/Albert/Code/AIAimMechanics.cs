@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using static UnityEngine.GraphicsBuffer;
 
 public class AIAimMechanics : MonoBehaviour
 {
@@ -10,19 +9,26 @@ public class AIAimMechanics : MonoBehaviour
     public Transform bulletPoint;
     public float initialPower = 10f;
     public float maxPower = 100f;
-    public float moveThreshold = 10f;
+    public float powerIncrement = 1f;
     public GameObject TargetPrefab;
     public AiManager aiManager;
     public TextMeshProUGUI powerValueText;
 
     private Vector3 direction;
-    private GameObject empty;
+    private Transform target;
     private float currentPower;
+    private bool shouldIncreasePower = false;
 
     private void Start()
     {
         currentPower = initialPower;
         UpdatePowerValueText();
+        TargetMovement.MovementCycleComplete += OnMovementCycleComplete;
+    }
+
+    private void OnDestroy()
+    {
+        TargetMovement.MovementCycleComplete -= OnMovementCycleComplete;
     }
 
     private void Update()
@@ -32,10 +38,10 @@ public class AIAimMechanics : MonoBehaviour
             AIUpdate();
         }
         // Adjust the cannon direction to look at the target
-        if (TargetPrefab != null)
+        if (target != null)
         {
             Vector3 cannonPosition = transform.position;
-            direction = TargetPrefab.transform.position - cannonPosition;
+            direction = target.position - cannonPosition;
             transform.right = direction;
         }
     }
@@ -51,40 +57,25 @@ public class AIAimMechanics : MonoBehaviour
             return;
         }
 
-        Vector3 playerPosition = playerObject.transform.position;
-        Vector3 aiPosition = transform.position;
-
-        // Calculate direction towards the player
-        direction = playerPosition - aiPosition;
-
-        // Spawn empty if it doesn't exist
-        if (empty == null)
+        // Ensure the target is on the player object
+        if (target == null)
         {
-            empty = Instantiate(TargetPrefab, playerPosition, Quaternion.identity);
+            target = Instantiate(TargetPrefab, playerObject.transform).transform;
         }
 
-        // Move the empty upwards
-        Vector3 targetUpPosition = empty.transform.position + Vector3.up * 10f;
-        empty.transform.position = Vector3.MoveTowards(empty.transform.position, targetUpPosition, 6f * Time.deltaTime);
+        // Adjust power based on the distance and determine if the shot will hit the player
+        AdjustPower();
 
-        // Adjust power based on the distance
-        float distance = Vector3.Distance(aiPosition, playerPosition);
-        AdjustPower(distance);
-
-        // Determine if the shot will hit the player
-        if (WillHitPlayer(playerPosition))
+        if (WillHitPlayer(playerObject.transform.position))
         {
             Shoot();
+            Debug.Log("Shot!");
         }
-        else
+        else if (shouldIncreasePower)
         {
-            // Check if the empty has moved away
-            float emptyDistance = Vector3.Distance(empty.transform.position, playerPosition);
-            if (emptyDistance > moveThreshold)
-            {
-                // Set shouldMove to true in AiManager
-                aiManager.SetShouldMove(true);
-            }
+            currentPower += powerIncrement; // Increment power if the shot will not hit
+            UpdatePowerValueText();
+            shouldIncreasePower = false; // Reset the flag
         }
     }
 
@@ -98,9 +89,10 @@ public class AIAimMechanics : MonoBehaviour
         }
     }
 
-    private void AdjustPower(float distance)
+    private void AdjustPower()
     {
-        currentPower = Mathf.Clamp(distance / 10f, initialPower, maxPower); // Adjust power based on distance
+        float distance = Vector3.Distance(transform.position, target.position);
+        currentPower = Mathf.Clamp(distance / 10f, initialPower, maxPower);
         UpdatePowerValueText();
     }
 
@@ -116,7 +108,7 @@ public class AIAimMechanics : MonoBehaviour
             bulletVelocity += gravity * Time.fixedDeltaTime;
 
             // If predicted position moves too far, return false
-            if (Vector3.Distance(predictedPosition, aiManager.gameObject.transform.position) > moveThreshold)
+            if (Vector3.Distance(predictedPosition, aiManager.gameObject.transform.position) > 100f) // Adjust threshold as needed
             {
                 return false;
             }
@@ -127,5 +119,10 @@ public class AIAimMechanics : MonoBehaviour
     private void UpdatePowerValueText()
     {
         powerValueText.text = currentPower.ToString("0");
+    }
+
+    private void OnMovementCycleComplete()
+    {
+        shouldIncreasePower = true;
     }
 }
