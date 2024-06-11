@@ -71,6 +71,7 @@ public class AIAimMechanics : MonoBehaviour
         {
             Shoot();
             Debug.Log("Shot!");
+            aiManager.aiTurn = false;
         }
         else if (shouldIncreasePower)
         {
